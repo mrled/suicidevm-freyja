@@ -22,3 +22,7 @@ We have configured `.gitignore` to ignore all files with `secret` in the name, u
 Multiple providers are defined in the Vagrant file, so you probably want to specify which one to bring up:
 
     vagrant up --provider hyperv
+
+## Troubleshooting
+
+- You can't do `vagrant up` from a mapped drive; you must do it from a local drive.
