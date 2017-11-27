@@ -1,0 +1,6 @@
+.vagrant
+
+# Ignore any file with "secret" in the name...
+*secret*
+# ... unless that file ends with ".asc", indicating GPG encryption
+!*secret*.asc
