@@ -16,7 +16,7 @@ Copy-Item -Path "C:\Freyja\system32\anyconnect.bat" -Destination "C:\Windows\sys
 
 # We do not want the GUI to start on login,
 # because running from the commandline will fail while the GUI is running
-$runKey = HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+$runKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
 Get-ChildItem -Path $runKey | Where-Object -Property Name -Match "AnyConnect" | Remove-Item -Force
 
 # provision.secret.ps1 contains secrets like passwords, and is not committed to the repo in plain text

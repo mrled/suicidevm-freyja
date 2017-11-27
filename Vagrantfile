@@ -35,6 +35,7 @@ Vagrant.configure("2") do |config|
             node.winrm.password = "V@grant123"
             node.vm.guest = :windows
             node.windows.halt_timeout = 15
+            node.vm.boot_timeout = 300
             node.vm.hostname = boxName
 
             node.vm.provider :virtualbox do |v, override|
@@ -48,12 +49,13 @@ Vagrant.configure("2") do |config|
                 v.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
             end
 
+            # Some, maybe most?, VPNs only work with bridged connections
+            # Furthermore, working with `vagrant rdp` might be tough on non-bridged public networks
+            # Hyper-V seems like it gets less testing/attention than VirtualBox
+            node.vm.network :public_network, :adapter=>1, type:"dhcp", :bridge=>'HyperVWifiSwitch'
+
             node.vm.provider "hyperv" do |h|
 
-                # Some, maybe most?, VPNs only work with bridged connections
-                # Furthermore, working with `vagrant rdp` might be tough on non-bridged public networks
-                # Hyper-V seems like it gets less testing/attention than VirtualBox
-                node.vm.network :public_network, :adapter=>1, type:"dhcp", :bridge=>'HyperVWifiSwitch'
 
                 h.cpus = cpuCount
                 h.memory = memCount
