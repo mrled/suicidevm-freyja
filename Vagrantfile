@@ -9,11 +9,11 @@ Vagrant.require_version ">= 1.9.4"
 freyjaRootDir = File.dirname(__FILE__)
 
 # How many VMs to bring up?
-freyjaVmCount = 1
+freyjaVmCount = 2
 
 # Why not calculate this based on the current date?
 # Because then it only works once during the `vagrant up`. It won't work for e.g. `vagrant rdp`.
-buildDate = "20171026"
+buildDate = "20180202"
 
 # VM settings - these apply no matter which provider
 cpuCount = 2
@@ -21,6 +21,9 @@ memCount = 2048
 
 # Secrets file (not committed to repo)
 secrets = JSON.parse(File.read(File.join(freyjaRootDir, 'Vagrantfile.secrets.json')))
+
+# Name of Hyper-V VSwitch to use:
+hvVswitchName = 'Wifi-HyperV-VSwitch'
 
 Vagrant.configure("2") do |config|
 
@@ -52,7 +55,7 @@ Vagrant.configure("2") do |config|
             # Some, maybe most?, VPNs only work with bridged connections
             # Furthermore, working with `vagrant rdp` might be tough on non-bridged public networks
             # Hyper-V seems like it gets less testing/attention than VirtualBox
-            node.vm.network :public_network, :adapter=>1, type:"dhcp", :bridge=>'HyperVWifiSwitch'
+            node.vm.network :public_network, :adapter=>1, type:"dhcp", :bridge=>hvVswitchName
 
             node.vm.provider "hyperv" do |h|
 
