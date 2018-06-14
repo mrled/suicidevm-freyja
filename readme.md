@@ -1,6 +1,6 @@
 # Freyja
 
-A SuicideVM, brough to you by [WinTrialLab](https://github.com/mrled/wintriallab)
+A SuicideVM for work
 
 ## Encrypted secrets
 
@@ -17,12 +17,8 @@ To decrypt the resulting `example.secrets.json.asc` file, overwriting the plaint
 
 We have configured `.gitignore` to ignore all files with `secret` in the name, unless the filename also ends with `.asc` to indicate GPG encryption
 
-## vagrant up
+## Lability
 
-Multiple providers are defined in the Vagrant file, so you probably want to specify which one to bring up:
-
-    vagrant up --provider hyperv
-
-## Troubleshooting
-
-- You can't do `vagrant up` from a mapped drive; you must do it from a local drive.
+Run the included `Deploy-FREYJA.ps1` script to deploy the lab VM.
+It will ask some questions about credentials if there isn't a decrypted secrets file at `secrets.FREYJA.json`.
+Then it will deploy the lab.
