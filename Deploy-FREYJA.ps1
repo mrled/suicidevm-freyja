@@ -1,7 +1,16 @@
-[CmdletBinding()] Param()
+[CmdletBinding()] Param(
+    [switch] $DeleteExisting
+)
 
 $ErrorActionPreference = "Stop"
 
+if (Get-Module -Name Lability) {
+    Write-Verbose -Message "Removing Lability module..."
+    Remove-Module -Name Lability
+} else {
+    Write-Verbose -Message "Lability module not imported."
+}
+Write-Verbose -Message "Importing Lability module..."
 Import-Module -Name Lability
 
 Write-Host -ForegroundColor Magenta -Object "Welcome to FREYJA"
@@ -44,10 +53,21 @@ $configParams = @{
     Verbose = $true
 }
 
+if ($DeleteExisting) {
+    Write-Host -Object "Deleting existing resources"
+    try {
+        Remove-VM -Name Freyja -Force -Verbose -ErrorAction SilentlyContinue | Out-Null
+        Write-Verbose -Message "Deleted Freyja VM"
+    } catch {
+        Write-Verbose -Message "No Freyja VM found"
+    }
+    Remove-Item -Path "${env:LabilityDifferencingVhdPath}\FREYJA*" -Force -Verbose
+}
+
 Write-Host -Object "Building the lab..."
 
 . $PSScriptRoot\Configure.FREYJA.ps1
 & FreyjaConfig @configParams
 
 Start-LabConfiguration -ConfigurationData $configData -Path $env:LabilityConfigurationPath -Verbose -Credential $adminCred -IgnorePendingReboot
-# Start-Lab -ConfigurationData $configData -Verbose
+Start-Lab -ConfigurationData $configData -Verbose
