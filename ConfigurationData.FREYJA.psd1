@@ -10,6 +10,10 @@
             Lability_ProcessorCount     = 1;
             Lability_StartupMemory      = 3GB;
             PSDscAllowPlainTextPassword = $true;
+            Lability_Resource           = @(
+                'Firefox'
+                'FuckingAnyconnect'
+            )
         }
     );
     NonNodeData = @{
@@ -19,6 +23,11 @@
                 @{ Name = 'xNetworking'; RequiredVersion = '5.7.0.0'; }
             );
             Resource = @(
+                @{
+                    Id = 'Firefox';
+                    Filename = 'Firefox-Latest.exe';
+                    Uri = 'https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US';
+                }
                 @{
                     Id = 'FuckingAnyconnect';
                     Filename = 'anyconnect-win-4.2.02075-web-deploy-k9.exe';

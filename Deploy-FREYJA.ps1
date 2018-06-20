@@ -11,7 +11,7 @@ if (Get-Module -Name Lability) {
     Write-Verbose -Message "Lability module not imported."
 }
 Write-Verbose -Message "Importing Lability module..."
-Import-Module -Name Lability
+Import-Module -Name Lability -Verbose:$false
 
 Write-Host -ForegroundColor Magenta -Object "Welcome to FREYJA"
 Write-Host -Object "We will now gather configuration data..."
