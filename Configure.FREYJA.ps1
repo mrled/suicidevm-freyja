@@ -146,7 +146,7 @@ Configuration FreyjaConfig {
                 Test-Path -Path "${env:ProgramFiles}\Mozilla Firefox"
             }
             SetScript = {
-                $process = Start-Process -FilePath "C:\Resources\Firefox-Latest.exe" -Wait -PassThru
+                $process = Start-Process -FilePath "C:\Resources\Firefox-Latest.exe" -Wait -PassThru -ArgumentList @('-ms')
                 if ($process.ExitCode -ne 0) {
                     throw "The Firefox installer at exited with code $($process.ExitCode)"
                 }

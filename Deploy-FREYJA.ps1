@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 if (Get-Module -Name Lability) {
     Write-Verbose -Message "Removing Lability module..."
-    Remove-Module -Name Lability
+    Remove-Module -Name Lability -Verbose:$false
 } else {
     Write-Verbose -Message "Lability module not imported."
 }
@@ -56,12 +56,21 @@ $configParams = @{
 if ($DeleteExisting) {
     Write-Host -Object "Deleting existing resources"
     try {
-        Remove-VM -Name Freyja -Force -Verbose -ErrorAction SilentlyContinue | Out-Null
+        Get-VM -Name Freyja -Verbose -ErrorAction Stop |
+            Stop-VM -TurnOff -PassThru -Force -Verbose -ErrorAction Stop |
+            Remove-VM -Force -Verbose -ErrorAction Stop
         Write-Verbose -Message "Deleted Freyja VM"
     } catch {
         Write-Verbose -Message "No Freyja VM found"
     }
-    Remove-Item -Path "${env:LabilityDifferencingVhdPath}\FREYJA*" -Force -Verbose
+    $freyjaDiskPath = "${env:LabilityDifferencingVhdPath}\FREYJA*"
+    while (Test-Path -Path $freyjaDiskPath) {
+        try {
+            Remove-Item -Path $freyjaDiskPath -Force -Verbose -ErrorAction Stop
+        } catch {
+            Start-Sleep -Seconds 2
+        }
+    }
 }
 
 Write-Host -Object "Building the lab..."
