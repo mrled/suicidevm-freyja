@@ -11,17 +11,6 @@ Configuration FreyjaConfig {
     Import-DscResource -Module xComputerManagement -ModuleVersion 4.1.0.0
     Import-DscResource -Module xNetworking -ModuleVersion 5.7.0.0
 
-    # A powershell script that converts a text file to UTF-8 without a Byte Order Mark (BOM)
-    $ConvertToUtf8NoBom = @(
-        '[CmdletBinding()] Param('
-        '    [Parameter(Mandatory)] [string] $FilePath'
-        ')'
-        '$contents = (Get-Content -Path $FilePath) -Join "`r`n"'
-        '$utf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList @($false)'
-        'Remove-Item -Path $FilePath'
-        '[System.IO.File]::WriteAllLines($FilePath, $contents, $utf8NoBomEncoding)'
-    ) -join "`r`n"
-
     # VPN configuration files
     # Actually just lines of text that are sent as standard input to the anyconnect exe
     # Some VPNs just need something like "username[ENTER]password[ENTER]",
@@ -76,28 +65,48 @@ Configuration FreyjaConfig {
             Ensure = "Present"
         }
 
-        File 'ConvertToUtf8NoBom' {
-            DestinationPath = "${env:ProgramData}\Freyja\ConvertTo-Utf8NoBom.ps1"
-            Contents = $ConvertToUtf8NoBom
-            Ensure = "Present"
+        Script "VpnConfigYesp" {
+            GetScript = { return @{ Result = "" } }
+            TestScript = {
+                if (Test-Path -LiteralPath "${env:ProgramData}\Freyja\YESP.config") {
+                    $content = Get-Content -LiteralPath "${env:ProgramData}\Freyja\YESP.config"
+                    return $content -EQ $using:YespVpnConfig
+                }
+                return $false
+            }
+            SetScript = {
+                Out-File -LiteralPath "${env:ProgramData}\Freyja\YESP.config" -InputObject $using:YespVpnConfig -Encoding ASCII -Force
+            }
         }
 
-        File 'VpnConfigYesp' {
-            DestinationPath = "${env:ProgramData}\Freyja\YESP.config"
-            Contents = $YespVpnConfig
-            Ensure = 'Present'
+        Script "VpnConfigBps" {
+            GetScript = { return @{ Result = "" } }
+            TestScript = {
+                if (Test-Path -LiteralPath "${env:ProgramData}\Freyja\BPS.config") {
+                    $content = Get-Content -LiteralPath "${env:ProgramData}\Freyja\BPS.config"
+                    return $content -EQ $using:BpsVpnConfig
+                }
+                return $false
+            }
+            SetScript = {
+                Out-File -LiteralPath "${env:ProgramData}\Freyja\BPS.config" -InputObject $using:BpsVpnConfig -Encoding ASCII -Force
+            }
         }
 
-        File 'VpnConfigBps' {
-            DestinationPath = "${env:ProgramData}\Freyja\BPS.config"
-            Contents = $BpsVpnConfig
-            Ensure = 'Present'
-        }
-
-        File 'AnyConnectYesp' {
-            DestinationPath = "${env:SystemRoot}\system32\yesp-anyconnect.bat"
-            Contents = '@anyconnect.bat connect {0} -s < "%ProgramData%\Freyja\YESP.config"' -f $YespVpnServer
-            Ensure = 'Present'
+        Script "AnyConnectYesp" {
+            GetScript = { return @{ Result = "" } }
+            TestScript = {
+                if (Test-Path -LiteralPath "${env:SystemRoot}\system32\yesp-anyconnect.bat") {
+                    $content = Get-Content -LiteralPath "${env:SystemRoot}\system32\yesp-anyconnect.bat"
+                    $bat = '@anyconnect.bat connect {0} -s < "%ProgramData%\Freyja\YESP.config"' -f $using:YespVpnServer
+                    return $content -EQ $bat
+                }
+                return $false
+            }
+            SetScript = {
+                $bat = '@anyconnect.bat connect {0} -s < "%ProgramData%\Freyja\YESP.config"' -f $using:YespVpnServer
+                Out-File -LiteralPath "${env:SystemRoot}\system32\yesp-anyconnect.bat" -InputObject $bat -Encoding ASCII -Force
+            }
         }
 
         # BPS requires two pre-config steps to deal with cert issues lololololololol
@@ -120,23 +129,19 @@ Configuration FreyjaConfig {
         # anyconnect.bat disconnect
         # $bpsPreConfig2 | anyconnect.bat connect $BpsVpnServer -s
         # anyconnect.bat disconnect
-        File 'AnyConnectBps' {
-            DestinationPath = "${env:SystemRoot}\system32\bps-anyconnect.bat"
-            Contents = '@anyconnect.bat connect {0} -s < "%ProgramData%\Freyja\BPS.config"' -f $BpsVpnServer
-            Ensure = 'Present'
-        }
-
-        # DSC will save the VPN configs as UTF-16, but anyconnect expects stdin to be UTF-8 with no BOM.
-        # Convert the config files to this format.
-        # This is kind of a dumb hack -
-        # a better solution would have some custom DSC resource for writing files in this format directly
-        Script "FixByteOrderMark" {
+        Script "AnyConnectBps" {
             GetScript = { return @{ Result = "" } }
-            TestScript = { $false }
-            SetScript = {
-                foreach ($config in (Get-ChildItem -Path "${env:ProgramData}\Freyja\*.config")) {
-                    & "${env:ProgramData}\Freyja\ConvertTo-Utf8NoBom.ps1" -FilePath $config.FullName
+            TestScript = {
+                if (Test-Path -LiteralPath "${env:SystemRoot}\system32\bps-anyconnect.bat") {
+                    $content = Get-Content -LiteralPath "${env:SystemRoot}\system32\bps-anyconnect.bat"
+                    $bat = '@anyconnect.bat connect {0} -s < "%ProgramData%\Freyja\BPS.config"' -f $using:BpsVpnServer
+                    return $content -EQ $bat
                 }
+                return $false
+            }
+            SetScript = {
+                $bat = '@anyconnect.bat connect {0} -s < "%ProgramData%\Freyja\BPS.config"' -f $using:BpsVpnServer
+                Out-File -LiteralPath "${env:SystemRoot}\system32\bps-anyconnect.bat" -InputObject $bat -Encoding ASCII -Force
             }
         }
 
@@ -156,12 +161,12 @@ Configuration FreyjaConfig {
         Script "InstallFuckingAnyconnect" {
             GetScript = { return @{ Result = "" } }
             TestScript = {
-                Test-Path -Path "C:\Program Files (x86)\Cisco AnyConnect VPN Client"
+                Test-Path -Path "${env:ProgramFiles(x86)}\Cisco AnyConnect VPN Client"
             }
             SetScript = {
                 $process = Start-Process -FilePath "C:\Resources\anyconnect-win-4.2.02075-web-deploy-k9.exe" -Wait -PassThru -ArgumentList @(
                     '/l*v!'
-                    'C:\ProgramData\Freyja\anyconnect_install.log'
+                    "${env:ProgramData}\Freyja\anyconnect_install.log"
                     '/quiet'
                     '/passive'
                     '/qn'
@@ -172,10 +177,20 @@ Configuration FreyjaConfig {
             }
         }
 
-        File "InstallFuckingAnyconnectBat" {
-            DestinationPath = 'C:\Windows\system32\anyconnect.bat'
-            Contents = '@"C:\Program Files (x86)\Cisco\Cisco AnyConnect Secure Mobility Client\vpncli.exe" %*'
-            Ensure = 'Present'
+        Script "InstallFuckingAnyconnectBat" {
+            GetScript = { return @{ Result = "" } }
+            TestScript = {
+                if (Test-Path -LiteralPath "${env:SystemRoot}\system32\anyconnect.bat") {
+                    $content = Get-Content -LiteralPath "${env:SystemRoot}\system32\anyconnect.bat"
+                    $bat = '@"%ProgramFiles(x86)%\Cisco\Cisco AnyConnect Secure Mobility Client\vpncli.exe" %*'
+                    return $content -EQ $bat
+                }
+                return $false
+            }
+            SetScript = {
+                $bat = '@"%ProgramFiles(x86)%\Cisco\Cisco AnyConnect Secure Mobility Client\vpncli.exe" %*'
+                Out-File -LiteralPath "${env:SystemRoot}\system32\anyconnect.bat" -InputObject $bat -Encoding ASCII -Force
+            }
         }
 
         Registry "DisableFuckingAnyconnectGuiAutostart" {
@@ -185,5 +200,4 @@ Configuration FreyjaConfig {
         }
 
     }
-p
 }
