@@ -145,6 +145,27 @@ Configuration FreyjaConfig {
             }
         }
 
+        File "Hosts" {
+            DestinationPath = "${env:SystemRoot}\System32\drivers\etc\hosts"
+            Contents = @(
+                "#### BPS"
+                "# Production"
+                "10.244.1.8          edfiapp01"
+                "10.244.1.144        edfisql01"
+                "10.244.1.145        edfisql02"
+                "10.244.5.40         edfiweb01"
+                "#10.244.5.??        edfiweb02"
+                "# Staging"
+                "10.23.12.48         stagedfiapp01"
+                "10.23.12.144        stagedfisql01"
+                "10.23.12.145        stagedfisql02"
+                "10.244.5.140        stagedfiweb01"
+                "# Development"
+                "10.244.1.47         cicd01"
+            )
+            Ensure = "Present"
+        }
+
         Script "InstallFirefox" {
             GetScript = { return @{ Result = "" } }
             TestScript = {
