@@ -166,6 +166,31 @@ Configuration FreyjaConfig {
             Ensure = "Present"
         }
 
+        Registry "AutoLogonEnable" {
+            Key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+            ValueName = 'AutoAdminLogon'
+            ValueData = '1'
+            ValueType = 'REG_SZ'
+        }
+        Registry "AutoLogonForce" {
+            Key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+            ValueName = 'ForceAutoLogon'
+            ValueData = '1'
+            ValueType = 'REG_SZ'
+        }
+        Registry "AutoLogonUsername" {
+            Key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+            ValueName = 'DefaultUserName'
+            ValueData = $Credential.UserName
+            ValueType = 'REG_SZ'
+        }
+        Registry "AutoLogonPassword" {
+            Key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon'
+            ValueName = 'DefaultPassword'
+            ValueData = $Credential.GetNetworkCredential().Password
+            ValueType = 'REG_SZ'
+        }
+
         Script "InstallFirefox" {
             GetScript = { return @{ Result = "" } }
             TestScript = {
