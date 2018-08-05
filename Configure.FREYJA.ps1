@@ -150,7 +150,7 @@ Configuration FreyjaConfig {
             Contents = @(
                 "#### BPS"
                 "# Production"
-                "10.244.1.8          edfiapp01"
+                "10.244.1.48         edfiapp01"
                 "10.244.1.144        edfisql01"
                 "10.244.1.145        edfisql02"
                 "10.244.5.40         edfiweb01"
