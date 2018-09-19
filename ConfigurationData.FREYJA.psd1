@@ -34,6 +34,11 @@
                     Uri = 'https://raw.githubusercontent.com/mrled/SuicideVM-Freyja/master/anyconnect-win-4.2.02075-web-deploy-k9.exe';
                     Checksum = 'D710A505A9871254DD1BA982D0C61A05';
                 };
+                @{
+                    Id = 'SSMS';
+                    Filename = 'SSMS-Setup-ENU.exe';
+                    Uri = 'https://download.microsoft.com/download/0/5/B/05B2AF8F-906F-4C57-A58E-5780F64F9D62/SSMS-Setup-ENU.exe';
+                };
             );
         };
     };

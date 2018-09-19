@@ -153,13 +153,15 @@ Configuration FreyjaConfig {
                 "10.244.1.48         edfiapp01"
                 "10.244.1.144        edfisql01"
                 "10.244.1.145        edfisql02"
+                "10.244.1.142        edfiprodlisten"
                 "10.244.5.40         edfiweb01"
-                "#10.244.5.??        edfiweb02"
+                "10.244.5.42         edfiweb02"
                 "# Staging"
                 "10.23.12.48         stagedfiapp01"
                 "10.23.12.144        stagedfisql01"
                 "10.23.12.145        stagedfisql02"
                 "10.244.5.140        stagedfiweb01"
+                "10.23.12.142        edfistaglisten"
                 "# Development"
                 "10.244.1.47         cicd01"
             )
@@ -218,6 +220,21 @@ Configuration FreyjaConfig {
             Key = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\AnyConnect"
             ValueName = ""
             Ensure = "Absent"
+        }
+
+        Script "InstallSsms" {
+            GetScript = { return @{ Result = "" } }
+            TestScript = {
+
+            }
+            SetScript = {
+                Start-Process -FilePath "C:\Resources\SSMS-Setup-ENU.exe" -ArgumentList @(
+                    "/install"
+                    "/quiet"
+                    "/norestart"
+                    "/log", "${env:ProgramData}\Freyja\SSMS.Install.log"
+                )
+            }
         }
 
     }
