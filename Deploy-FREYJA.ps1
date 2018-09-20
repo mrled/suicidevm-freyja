@@ -75,8 +75,12 @@ if ($DeleteExisting) {
 
 Write-Host -Object "Building the lab..."
 
+Write-Verbose -Message "Dot-sourcing configure script..."
 . $PSScriptRoot\Configure.FREYJA.ps1
+Write-Verbose -Message "Executing the configure script..."
 & FreyjaConfig @configParams
 
+Write-Verbose -Message "Starting lab configuration..."
 Start-LabConfiguration -ConfigurationData $configData -Path $env:LabilityConfigurationPath -Verbose -Credential $adminCred -IgnorePendingReboot
+Write-verbose -Message "Starting lab..."
 Start-Lab -ConfigurationData $configData -Verbose
