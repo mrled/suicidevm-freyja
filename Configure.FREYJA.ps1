@@ -225,7 +225,7 @@ Configuration FreyjaConfig {
         Script "InstallSsms" {
             GetScript = { return @{ Result = "" } }
             TestScript = {
-
+                Test-Path -Path "C:\${env:ProgramFIles(x86)}\Microsoft SQL Server\140\Tools\Binn\ManagementStudio\Ssms.exe"
             }
             SetScript = {
                 Start-Process -FilePath "C:\Resources\SSMS-Setup-ENU.exe" -ArgumentList @(
