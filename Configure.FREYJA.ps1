@@ -164,7 +164,7 @@ Configuration FreyjaConfig {
                 "10.23.12.142        edfistaglisten"
                 "# Development"
                 "10.244.1.47         cicd01"
-            )
+            ) -Join "`r`n"
             Ensure = "Present"
         }
 
