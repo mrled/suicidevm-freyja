@@ -13,11 +13,12 @@
             Lability_Resource           = @(
                 'Firefox'
                 'FuckingAnyconnect'
-            )
+            );
         }
     );
     NonNodeData = @{
         Lability = @{
+            EnvironmentPrefix = "FRJ0920"
             DSCResource = @(
                 @{ Name = 'xComputerManagement'; RequiredVersion = '4.1.0.0'; }
                 @{ Name = 'xNetworking'; RequiredVersion = '5.7.0.0'; }
