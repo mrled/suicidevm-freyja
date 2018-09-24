@@ -1,11 +1,10 @@
 @{
     AllNodes = @(
         @{
-            NodeName                    = 'FREYJA';
+            NodeName                    = 'FREYJA20180920';
             Role                        = 'FREYJA';
             InterfaceAlias              = 'Ethernet';
             AddressFamily               = 'IPv4';
-            # Lability_SwitchName         = "Wifi-HyperV-VSwitch";
             Lability_Media              = 'WIN10_x64_Enterprise_EN_Eval';
             Lability_ProcessorCount     = 1;
             Lability_StartupMemory      = 3GB;
@@ -13,12 +12,12 @@
             Lability_Resource           = @(
                 'Firefox'
                 'FuckingAnyconnect'
+                'SSMS'
             );
         }
     );
     NonNodeData = @{
         Lability = @{
-            EnvironmentPrefix = "FRJ0920"
             DSCResource = @(
                 @{ Name = 'xComputerManagement'; RequiredVersion = '4.1.0.0'; }
                 @{ Name = 'xNetworking'; RequiredVersion = '5.7.0.0'; }
