@@ -86,11 +86,12 @@ Configuration FreyjaConfig {
         Script "VpnConfigYesp" {
             GetScript = { return @{ Result = "" } }
             TestScript = {
-                if (Test-Path -LiteralPath "${env:ProgramData}\Freyja\YESP.config") {
-                    $content = Get-Content -LiteralPath "${env:ProgramData}\Freyja\YESP.config"
-                    return $content -EQ $using:YespVpnConfig
-                }
-                return $false
+                # if (Test-Path -LiteralPath "${env:ProgramData}\Freyja\YESP.config") {
+                #     $content = Get-Content -LiteralPath "${env:ProgramData}\Freyja\YESP.config"
+                #     return $content -EQ $using:YespVpnConfig
+                # }
+                # return $false
+                Test-Path -LiteralPath "${env:ProgramData}\Freyja\YESP.config"
             }
             SetScript = {
                 Out-File -LiteralPath "${env:ProgramData}\Freyja\YESP.config" -InputObject $using:YespVpnConfig -Encoding ASCII -Force
@@ -100,11 +101,12 @@ Configuration FreyjaConfig {
         Script "VpnConfigBps" {
             GetScript = { return @{ Result = "" } }
             TestScript = {
-                if (Test-Path -LiteralPath "${env:ProgramData}\Freyja\BPS.config") {
-                    $content = Get-Content -LiteralPath "${env:ProgramData}\Freyja\BPS.config"
-                    return $content -EQ $using:BpsVpnConfig
-                }
-                return $false
+                # if (Test-Path -LiteralPath "${env:ProgramData}\Freyja\BPS.config") {
+                #     $content = Get-Content -LiteralPath "${env:ProgramData}\Freyja\BPS.config"
+                #     return $content -EQ $using:BpsVpnConfig
+                # }
+                # return $false
+                Test-Path -LiteralPath "${env:ProgramData}\Freyja\BPS.config"
             }
             SetScript = {
                 Out-File -LiteralPath "${env:ProgramData}\Freyja\BPS.config" -InputObject $using:BpsVpnConfig -Encoding ASCII -Force
