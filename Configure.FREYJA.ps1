@@ -59,6 +59,24 @@ Configuration FreyjaConfig {
             Name = $node.NodeName;
         }
 
+        # The Hyper-V default switch has some DNS server that breaks all the god damned time
+        Script "FuckingDnsServer" {
+            GetScript = { return @{ Result = "" } }
+            TestScript = { return $false }
+            SetScript = {
+                $interfaceIdx = Get-NetIPAddress -InterfaceAlias Ethernet -AddressFamily IPv4 |
+                    Select-Object -ExpandProperty InterfaceIndex -First 1
+                try {
+                    Set-DNSClientServerAddress -interfaceIndex $interfaceIdx -ServerAddresses @("1.1.1.1")
+                } catch {
+                    $Error |
+                        Select-Object -Property * |
+                        Format-Table |
+                        Out-File -Path C:\FuckingDnsError.txt
+                }
+            }
+        }
+
         File 'FreyjaProgramData' {
             DestinationPath = "${env:ProgramData}\Freyja"
             Type = "Directory"
